@@ -1,5 +1,6 @@
 import serial
 import time
+import command
 
 '''
 with serial.Serial('COM4', 9600, timeout=5, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE) as ser:
@@ -37,6 +38,7 @@ with serial.Serial('COM4', 9600, timeout=5, bytesize=serial.EIGHTBITS, stopbits=
     ser.close()
 '''
 
+'''
 with serial.Serial('COM4', 9600, timeout=5, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE) as ser:
     ser.reset_input_buffer()
     ser.reset_output_buffer()
@@ -80,7 +82,41 @@ with serial.Serial('COM4', 9600, timeout=5, bytesize=serial.EIGHTBITS, stopbits=
     print(enq.hex())
     ser.write(enq)
 
+    # -----------------------------------------------
+    data = bytearray([0x02, 0x31, 0x35, 0x41, 0x50, 0x03, 0x14])
+    ser.write(data)
 
+    time.sleep(0.5)
+    print(ser.inWaiting())
+    # x = ser.read()          # read one byte
+    s = ser.read(3)  # read up to ten bytes (timeout)
+    print(s.hex())
+
+    enq = bytearray([0x05, 0x31, 0x35])
+    print(enq.hex())
+    ser.write(enq)
+'''
+
+ackHex = bytearray([0x05, 0x31, 0x35])
+with serial.Serial('COM4', 9600, timeout=5, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE) as ser:
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+
+    commandList = command.return2Front
+
+    for commandItem in commandList:
+        data = commandItem
+        ser.write(data)
+
+        time.sleep(0.5)
+        print(ser.inWaiting())
+        # x = ser.read()          # read one byte
+        s = ser.read(3)  # read up to ten bytes (timeout)
+        print(s.hex())
+
+        enq = ackHex
+        print(enq.hex())
+        ser.write(enq)
 
 
 
